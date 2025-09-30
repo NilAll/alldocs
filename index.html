@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AllDocs - Gerenciador de Documentos</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        /* Estilo para garantir que o layout ocupe a tela toda no mobile */
+        html, body {
+            height: 100%;
+            overflow: hidden;
+        }
+        body {
+            display: flex;
+            flex-direction: column;
+        }
+        main {
+            flex-grow: 1;
+            overflow-y: auto;
+        }
+        #app-screen {
+             display: none; /* Começa escondido */
+        }
+        /* Animação para o modal */
+        .modal-enter {
+            animation: fadeIn 0.3s ease-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        /* Custom scrollbar for a better mobile look */
+        main::-webkit-scrollbar {
+            width: 6px;
+        }
+        main::-webkit-scrollbar-thumb {
+            background-color: #4f46e5;
+            border-radius: 10px;
+        }
+        main::-webkit-scrollbar-track {
+            background-color: #1f2937;
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-white font-sans">
+
+    <!-- Auth Screen: Tela de Login/Cadastro -->
+    <div id="auth-screen" class="flex flex-col items-center justify-center h-full p-6">
+        <i data-lucide="shield-check" class="w-24 h-24 text-indigo-500 mb-6"></i>
+        <h1 class="text-4xl font-bold text-white mb-2">Bem-vindo ao AllDocs</h1>
+        <p class="text-gray-400 mb-8">Seu gerenciador de documentos local.</p>
+        
+        <div class="w-full max-w-sm">
+            <form id="auth-form" class="space-y-4">
+                <div>
+                    <label for="username" class="block text-sm font-medium text-gray-300 mb-1">Nome de Usuário</label>
+                    <input type="text" id="username" placeholder="Digite seu usuário" class="w-full bg-gray-700 text-white rounded-md p-3 focus:outline-none focus:ring-2 focus:ring-indigo-500" required>
+                </div>
+                <div>
+                    <label for="password" class="block text-sm font-medium text-gray-300 mb-1">Senha</label>
+                    <input type="password" id="password" placeholder="Digite sua senha" class="w-full bg-gray-700 text-white rounded-md p-3 focus:outline-none focus:ring-2 focus:ring-indigo-500" required>
+                </div>
+                <div class="flex space-x-2 pt-2">
+                     <button type="button" id="login-btn" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded-md transition-transform transform hover:scale-105">Entrar</button>
+                     <button type="button" id="signup-btn" class="w-full bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-4 rounded-md transition-transform transform hover:scale-105">Criar Conta</button>
+                </div>
+            </form>
+            <p class="text-xs text-gray-500 mt-4 text-center">Suas contas e dados são salvos apenas neste dispositivo.</p>
+        </div>
+    </div>
+
+    <!-- App Screen: Tela Principal do Aplicativo -->
+    <div id="app-screen" class="h-full flex-col">
+        <!-- Header -->
+        <header class="bg-gray-800 p-4 shadow-md z-10 sticky top-0 flex items-center justify-between">
+            <h1 class="text-2xl font-bold text-indigo-400">AllDocs</h1>
+            <div>
+                <button id="settings-btn" class="p-2 hover:bg-gray-700 rounded-full">
+                    <i data-lucide="settings" class="w-6 h-6 text-gray-300"></i>
+                </button>
+            </div>
+        </header>
+        <div class="bg-gray-800 px-4 pb-4">
+             <div class="relative">
+                <input type="search" id="search-bar" placeholder="Pesquisar por nome..." class="w-full bg-gray-700 text-white placeholder-gray-400 rounded-lg py-2 pl-10 pr-4 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <i data-lucide="search" class="w-5 h-5 text-gray-400"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content: Lista de Recibos -->
+        <main id="receipts-list" class="p-4 space-y-3">
+            <!-- Recibos serão inseridos aqui via JS -->
+        </main>
+        
+        <!-- Mensagem de Lista Vazia -->
+        <div id="empty-state" class="hidden flex-col items-center justify-center text-center p-8 h-full">
+            <i data-lucide="file-text" class="w-24 h-24 text-gray-600 mb-4"></i>
+            <h2 class="text-xl font-semibold text-gray-400">Nenhum documento ainda</h2>
+            <p class="text-gray-500 mt-2">Clique no botão '+' para adicionar seu primeiro documento.</p>
+        </div>
+
+        <!-- Floating Action Button (FAB) -->
+        <button id="add-receipt-btn" class="fixed bottom-6 right-6 bg-indigo-600 hover:bg-indigo-700 text-white rounded-full p-4 shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-900 focus:ring-indigo-500 transition-transform transform hover:scale-110">
+            <i data-lucide="plus" class="w-8 h-8"></i>
+        </button>
+    </div>
+
+
+    <!-- Modals -->
+    <!-- Modal: Adicionar Recibo -->
+    <div id="add-modal" class="hidden fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center p-4 z-50 modal-enter">
+        <div class="bg-gray-800 rounded-lg shadow-xl w-full max-w-sm p-6">
+            <h2 class="text-xl font-bold mb-4">Novo Documento</h2>
+            <form id="add-receipt-form">
+                <div class="mb-4">
+                    <label for="receipt-name" class="block text-sm font-medium text-gray-300 mb-1">Nome do Objeto/Serviço</label>
+                    <input type="text" id="receipt-name" class="w-full bg-gray-700 text-white rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-indigo-500" required>
+                </div>
+                <div class="mb-6">
+                    <label class="block text-sm font-medium text-gray-300 mb-2">Anexar Documento</label>
+                    <div class="flex space-x-2">
+                        <label for="take-photo-input" class="flex-1 cursor-pointer text-center bg-gray-700 hover:bg-gray-600 text-indigo-300 font-bold py-2 px-4 rounded-md transition duration-300 flex items-center justify-center space-x-2">
+                            <i data-lucide="camera" class="w-5 h-5"></i>
+                            <span>Tirar Foto</span>
+                        </label>
+                        <input type="file" id="take-photo-input" accept="image/*" capture="environment" class="hidden">
+                        
+                        <label for="upload-file-input" class="flex-1 cursor-pointer text-center bg-gray-700 hover:bg-gray-600 text-indigo-300 font-bold py-2 px-4 rounded-md transition duration-300 flex items-center justify-center space-x-2">
+                            <i data-lucide="upload" class="w-5 h-5"></i>
+                            <span>Upload</span>
+                        </label>
+                        <input type="file" id="upload-file-input" accept="image/*,application/pdf" class="hidden">
+                    </div>
+                    <p id="file-name" class="text-sm text-gray-400 mt-2 truncate"></p>
+                </div>
+                <div class="flex justify-end space-x-3">
+                    <button type="button" id="cancel-add-btn" class="bg-gray-600 hover:bg-gray-500 text-white font-bold py-2 px-4 rounded-md">Cancelar</button>
+                    <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-md">Salvar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal: Visualizar Recibo -->
+    <div id="view-modal" class="hidden fixed inset-0 bg-black bg-opacity-70 flex flex-col z-50 modal-enter">
+         <div class="bg-gray-800 p-4 flex justify-between items-center">
+            <h2 id="view-modal-title" class="text-lg font-bold truncate">Visualizar Documento</h2>
+            <button id="close-view-btn" class="text-gray-300 hover:text-white">
+                <i data-lucide="x" class="w-6 h-6"></i>
+            </button>
+        </div>
+        <div class="flex-grow p-1 bg-gray-700">
+             <iframe id="pdf-viewer" class="w-full h-full border-none"></iframe>
+        </div>
+        <div class="bg-gray-800 p-4 flex justify-around items-center">
+            <button id="download-btn" class="flex flex-col items-center text-indigo-400 hover:text-indigo-300">
+                <i data-lucide="download" class="w-6 h-6"></i>
+                <span class="text-xs mt-1">Baixar</span>
+            </button>
+            <button id="share-btn" class="flex flex-col items-center text-indigo-400 hover:text-indigo-300">
+                <i data-lucide="share-2" class="w-6 h-6"></i>
+                <span class="text-xs mt-1">Compartilhar</span>
+            </button>
+        </div>
+    </div>
+    
+    <!-- Modal: Configurações, Backup e Restauração -->
+    <div id="settings-modal" class="hidden fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center p-4 z-50 modal-enter">
+        <div class="bg-gray-800 rounded-lg shadow-xl w-full max-w-sm p-6">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl font-bold">Configurações</h2>
+                <button id="close-settings-btn" class="p-1 rounded-full hover:bg-gray-700">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+            <div class="space-y-4">
+                <button id="backup-btn" class="w-full flex items-center justify-center space-x-2 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-md">
+                    <i data-lucide="database-backup" class="w-5 h-5"></i>
+                    <span>Fazer Backup</span>
+                </button>
+                
+                <label for="restore-input" class="w-full cursor-pointer flex items-center justify-center space-x-2 bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded-md">
+                    <i data-lucide="database-zap" class="w-5 h-5"></i>
+                    <span>Restaurar Backup</span>
+                </label>
+                <input type="file" id="restore-input" accept=".json" class="hidden">
+
+                <hr class="border-gray-600">
+
+                <button id="logout-btn" class="w-full flex items-center justify-center space-x-2 bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-4 rounded-md">
+                     <i data-lucide="log-out" class="w-5 h-5"></i>
+                    <span>Sair (Logout)</span>
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal de Alerta Customizado -->
+    <div id="alert-modal" class="hidden fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center p-4 z-[100] modal-enter">
+        <div class="bg-gray-800 rounded-lg shadow-xl w-full max-w-sm p-6 text-center">
+            <p id="alert-message" class="mb-4 text-white"></p>
+            <button id="alert-ok-btn" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-6 rounded-md">OK</button>
+        </div>
+    </div>
+    
+    <!-- Modal de Confirmação Customizado -->
+    <div id="confirm-modal" class="hidden fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center p-4 z-[100] modal-enter">
+        <div class="bg-gray-800 rounded-lg shadow-xl w-full max-w-sm p-6 text-center">
+            <p id="confirm-message" class="mb-6 text-white"></p>
+            <div class="flex justify-center space-x-4">
+                <button id="confirm-cancel-btn" class="bg-gray-600 hover:bg-gray-500 text-white font-bold py-2 px-6 rounded-md">Cancelar</button>
+                <button id="confirm-ok-btn" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-6 rounded-md">Confirmar</button>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Inicializa os ícones do Lucide
+            lucide.createIcons();
+
+            // Elementos da DOM
+            const authScreen = document.getElementById('auth-screen');
+            const appScreen = document.getElementById('app-screen');
+            const authForm = document.getElementById('auth-form');
+            const usernameInput = document.getElementById('username');
+            const passwordInput = document.getElementById('password');
+            const loginBtn = document.getElementById('login-btn');
+            const signupBtn = document.getElementById('signup-btn');
+            
+            const settingsBtn = document.getElementById('settings-btn');
+            const settingsModal = document.getElementById('settings-modal');
+            const closeSettingsBtn = document.getElementById('close-settings-btn');
+            const backupBtn = document.getElementById('backup-btn');
+            const restoreInput = document.getElementById('restore-input');
+            const logoutBtn = document.getElementById('logout-btn');
+
+            const receiptsList = document.getElementById('receipts-list');
+            const searchBar = document.getElementById('search-bar');
+            const addReceiptBtn = document.getElementById('add-receipt-btn');
+            const addModal = document.getElementById('add-modal');
+            const cancelAddBtn = document.getElementById('cancel-add-btn');
+            const addReceiptForm = document.getElementById('add-receipt-form');
+            const receiptNameInput = document.getElementById('receipt-name');
+            const takePhotoButton = document.getElementById('take-photo-input');
+            const uploadFileInput = document.getElementById('upload-file-input');
+            const fileNameDisplay = document.getElementById('file-name');
+            const viewModal = document.getElementById('view-modal');
+            const closeViewBtn = document.getElementById('close-view-btn');
+            const pdfViewer = document.getElementById('pdf-viewer');
+            const downloadBtn = document.getElementById('download-btn');
+            const shareBtn = document.getElementById('share-btn');
+            const emptyState = document.getElementById('empty-state');
+
+            const alertModal = document.getElementById('alert-modal');
+            const alertMessage = document.getElementById('alert-message');
+            const alertOkBtn = document.getElementById('alert-ok-btn');
+
+            const confirmModal = document.getElementById('confirm-modal');
+            const confirmMessage = document.getElementById('confirm-message');
+            const confirmOkBtn = document.getElementById('confirm-ok-btn');
+            const confirmCancelBtn = document.getElementById('confirm-cancel-btn');
+            
+            // Variáveis de estado
+            let receipts = [];
+            let currentFile = null;
+            let currentViewingId = null;
+            let currentUser = null;
+            let confirmCallback = null;
+
+            // --- LÓGICA DE AUTENTICAÇÃO E SESSÃO ---
+
+            function initApp() {
+                currentUser = localStorage.getItem('allDocsCurrentUser');
+                if (currentUser) {
+                    authScreen.style.display = 'none';
+                    appScreen.style.display = 'flex';
+                    loadReceipts();
+                } else {
+                    authScreen.style.display = 'flex';
+                    appScreen.style.display = 'none';
+                }
+            }
+
+            loginBtn.addEventListener('click', () => {
+                const username = usernameInput.value.trim().toLowerCase();
+                const password = passwordInput.value.trim();
+
+                if (!username || !password) {
+                    showAlert('Por favor, preencha o usuário e a senha.');
+                    return;
+                }
+
+                let users = JSON.parse(localStorage.getItem('allDocsUsers') || '[]');
+                const user = users.find(u => u.username === username && u.password === password);
+
+                if (user) {
+                    localStorage.setItem('allDocsCurrentUser', username);
+                    initApp();
+                } else {
+                    showAlert('Usuário ou senha inválidos.');
+                }
+            });
+            
+            signupBtn.addEventListener('click', () => {
+                const username = usernameInput.value.trim().toLowerCase();
+                const password = passwordInput.value.trim();
+
+                if (!username || !password) {
+                    showAlert('Por favor, preencha o usuário e a senha para criar a conta.');
+                    return;
+                }
+                
+                let users = JSON.parse(localStorage.getItem('allDocsUsers') || '[]');
+                const existingUser = users.find(u => u.username === username);
+
+                if (existingUser) {
+                    showAlert('Este nome de usuário já existe. Tente outro.');
+                } else {
+                    users.push({ username, password });
+                    localStorage.setItem('allDocsUsers', JSON.stringify(users));
+                    localStorage.setItem('allDocsCurrentUser', username);
+                    showAlert('Conta criada com sucesso!');
+                    initApp();
+                }
+            });
+
+            logoutBtn.addEventListener('click', () => {
+                showConfirm('Tem certeza que deseja sair?', () => {
+                    localStorage.removeItem('allDocsCurrentUser');
+                    currentUser = null;
+                    receipts = [];
+                    closeSettingsModal();
+                    initApp();
+                });
+            });
+
+            // --- LÓGICA DE DADOS (CARREGAR, SALVAR, RENDERIZAR) ---
+            
+            function loadReceipts() {
+                if (!currentUser) return;
+                const storedReceipts = localStorage.getItem(`allDocsData_${currentUser}`);
+                receipts = storedReceipts ? JSON.parse(storedReceipts) : [];
+                renderReceipts();
+            }
+            
+            function saveReceipts() {
+                if (!currentUser) return;
+                try {
+                    localStorage.setItem(`allDocsData_${currentUser}`, JSON.stringify(receipts));
+                } catch (e) {
+                    if (e.name === 'QuotaExceededError' || e.name === 'NS_ERROR_DOM_QUOTA_REACHED') {
+                         showAlert("Erro ao salvar: Armazenamento cheio! Faça um backup e apague alguns itens para liberar espaço.");
+                    } else {
+                        showAlert("Ocorreu um erro desconhecido ao salvar os dados.");
+                        console.error("Error saving to localStorage:", e);
+                    }
+                }
+            }
+
+            function renderReceipts(items = receipts) {
+                receiptsList.innerHTML = '';
+                if (items.length === 0) {
+                    emptyState.classList.remove('hidden');
+                    emptyState.classList.add('flex');
+                    receiptsList.classList.add('hidden');
+                } else {
+                    emptyState.classList.add('hidden');
+                    receiptsList.classList.remove('hidden');
+                    items.forEach(receipt => {
+                        const receiptCard = `
+                            <div class="bg-gray-800 rounded-lg p-4 flex items-center justify-between shadow-md hover:bg-gray-700 transition-colors duration-200">
+                                <div class="flex items-center space-x-4 truncate">
+                                    <div class="bg-indigo-500 p-2 rounded-full">
+                                        <i data-lucide="file-text" class="w-6 h-6 text-white"></i>
+                                    </div>
+                                    <div class="truncate">
+                                        <h3 class="font-semibold truncate">${receipt.name}</h3>
+                                        <p class="text-sm text-gray-400">${new Date(receipt.date).toLocaleDateString('pt-BR')}</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-center space-x-2">
+                                    <button data-id="${receipt.id}" class="view-btn p-2 text-gray-400 hover:text-indigo-400 rounded-full">
+                                        <i data-lucide="eye" class="w-5 h-5 pointer-events-none"></i>
+                                    </button>
+                                    <button data-id="${receipt.id}" class="delete-btn p-2 text-gray-400 hover:text-red-500 rounded-full">
+                                        <i data-lucide="trash-2" class="w-5 h-5 pointer-events-none"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        `;
+                        receiptsList.innerHTML += receiptCard;
+                    });
+                    lucide.createIcons();
+                }
+            }
+            
+            // --- LÓGICA DE BACKUP E RESTAURAÇÃO ---
+            
+            backupBtn.addEventListener('click', () => {
+                if(receipts.length === 0) {
+                    showAlert('Não há dados para fazer backup.');
+                    return;
+                }
+                const dataStr = JSON.stringify(receipts);
+                const dataBlob = new Blob([dataStr], {type: 'application/json'});
+                const url = URL.createObjectURL(dataBlob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `alldocs_backup_${currentUser}_${new Date().toISOString().split('T')[0]}.json`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                showAlert('Backup realizado com sucesso!');
+                closeSettingsModal();
+            });
+
+            restoreInput.addEventListener('change', (event) => {
+                const file = event.target.files[0];
+                if (!file) return;
+
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    try {
+                        const restoredData = JSON.parse(e.target.result);
+                        // Validação simples do backup
+                        if (Array.isArray(restoredData) && (restoredData.length === 0 || restoredData[0].id)) {
+                             showConfirm('Isso substituirá TODOS os seus dados atuais. Deseja continuar?', () => {
+                                receipts = restoredData;
+                                saveReceipts();
+                                renderReceipts();
+                                showAlert('Backup restaurado com sucesso!');
+                                closeSettingsModal();
+                            });
+                        } else {
+                           showAlert('Arquivo de backup inválido.');
+                        }
+                    } catch (err) {
+                        showAlert('Erro ao ler o arquivo de backup.');
+                    } finally {
+                        restoreInput.value = ''; // Limpa o input
+                    }
+                };
+                reader.readAsText(file);
+            });
+
+            // --- MODAIS E ALERTAS ---
+
+            function showAlert(message) {
+                alertMessage.textContent = message;
+                alertModal.classList.remove('hidden');
+            }
+            alertOkBtn.addEventListener('click', () => alertModal.classList.add('hidden'));
+            
+            function showConfirm(message, onConfirm) {
+                confirmMessage.textContent = message;
+                confirmModal.classList.remove('hidden');
+                confirmCallback = onConfirm;
+            }
+            confirmOkBtn.addEventListener('click', () => {
+                confirmModal.classList.add('hidden');
+                if (confirmCallback) confirmCallback();
+                confirmCallback = null;
+            });
+            confirmCancelBtn.addEventListener('click', () => {
+                confirmModal.classList.add('hidden');
+                confirmCallback = null;
+            });
+
+            // Funções de controle dos modais
+            function openAddModal() { addReceiptForm.reset(); currentFile = null; fileNameDisplay.textContent = ''; addModal.classList.remove('hidden'); }
+            function closeAddModal() { addModal.classList.add('hidden'); }
+            function openViewModal(id) {
+                const receipt = receipts.find(r => r.id === id);
+                if (receipt) {
+                    currentViewingId = id;
+                    document.getElementById('view-modal-title').textContent = receipt.name;
+                    pdfViewer.src = receipt.pdfData;
+                    viewModal.classList.remove('hidden');
+                    viewModal.classList.add('flex');
+                }
+            }
+            function closeViewModal() { viewModal.classList.add('hidden'); viewModal.classList.remove('flex'); pdfViewer.src = ''; currentViewingId = null; }
+            function openSettingsModal() { settingsModal.classList.remove('hidden'); }
+            function closeSettingsModal() { settingsModal.classList.add('hidden'); }
+
+            // --- LÓGICA DE ADIÇÃO DE DOCUMENTOS (PDF) ---
+
+            function processImageFile(file) {
+                return new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        const img = new Image();
+                        img.onload = () => {
+                            try {
+                                const { jsPDF } = window.jspdf;
+                                const doc = new jsPDF();
+                                const imgData = e.target.result;
+                                const imgProps = doc.getImageProperties(imgData);
+                                const pdfWidth = doc.internal.pageSize.getWidth();
+                                let pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+                                let pageHeight = doc.internal.pageSize.getHeight();
+                                
+                                // Lida com imagens muito altas para a página
+                                if (pdfHeight > pageHeight) {
+                                    // A imagem será cortada se for maior que a página,
+                                    // mas isso evita a criação de PDFs inválidos.
+                                    pdfHeight = pageHeight;
+                                }
+
+                                doc.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight);
+                                resolve(doc.output('datauristring'));
+                            } catch (error) {
+                                reject(error);
+                            }
+                        };
+                        img.onerror = reject;
+                        img.src = e.target.result;
+                    };
+                    reader.onerror = reject;
+                    reader.readAsDataURL(file);
+                });
+            }
+
+            function processPdfFile(file) {
+                return new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.onload = (e) => resolve(e.target.result);
+                    reader.onerror = reject;
+                    reader.readAsDataURL(file);
+                });
+            }
+
+            async function addReceipt(name, file) {
+                try {
+                    let pdfDataUri;
+                    if (file.type.startsWith('image/')) {
+                        pdfDataUri = await processImageFile(file);
+                    } else if (file.type === 'application/pdf') {
+                        pdfDataUri = await processPdfFile(file);
+                    } else {
+                        showAlert('Formato de arquivo não suportado. Use imagens (JPG, PNG) ou PDF.');
+                        return;
+                    }
+
+                    if (pdfDataUri) {
+                        const newReceipt = { id: Date.now().toString(), name: name, date: new Date().toISOString(), pdfData: pdfDataUri };
+                        receipts.unshift(newReceipt);
+                        saveReceipts();
+                        renderReceipts();
+                        closeAddModal();
+                    }
+                } catch (error) {
+                    console.error("Error processing file:", error);
+                    showAlert('Ocorreu um erro ao processar o arquivo. Pode ser um formato de imagem não suportado ou o arquivo está corrompido.');
+                }
+            }
+
+            // --- MANIPULADORES DE EVENTOS ---
+
+            settingsBtn.addEventListener('click', openSettingsModal);
+            closeSettingsBtn.addEventListener('click', closeSettingsModal);
+            addReceiptBtn.addEventListener('click', openAddModal);
+            cancelAddBtn.addEventListener('click', closeAddModal);
+            closeViewBtn.addEventListener('click', closeViewModal);
+
+            const handleFileSelect = (e) => {
+                const file = e.target.files[0];
+                if (file) {
+                    currentFile = file;
+                    fileNameDisplay.textContent = file.name;
+                }
+            };
+            takePhotoButton.addEventListener('change', handleFileSelect);
+            uploadFileInput.addEventListener('change', handleFileSelect);
+
+            addReceiptForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const name = receiptNameInput.value.trim();
+                if (name && currentFile) {
+                    addReceipt(name, currentFile);
+                } else {
+                    showAlert('Por favor, preencha o nome e selecione um arquivo.');
+                }
+            });
+
+            searchBar.addEventListener('input', (e) => {
+                const searchTerm = e.target.value.toLowerCase();
+                const filteredReceipts = receipts.filter(r => r.name.toLowerCase().includes(searchTerm));
+                renderReceipts(filteredReceipts);
+            });
+
+            receiptsList.addEventListener('click', (e) => {
+                const viewBtn = e.target.closest('.view-btn');
+                const deleteBtn = e.target.closest('.delete-btn');
+                if (viewBtn) openViewModal(viewBtn.dataset.id);
+                if (deleteBtn) {
+                    showConfirm('Tem certeza que deseja apagar este documento?', () => {
+                        const idToDelete = deleteBtn.dataset.id;
+                        receipts = receipts.filter(r => r.id !== idToDelete);
+                        saveReceipts();
+                        renderReceipts();
+                    });
+                }
+            });
+            
+            downloadBtn.addEventListener('click', () => {
+                const receipt = receipts.find(r => r.id === currentViewingId);
+                if (receipt) {
+                    const a = document.createElement('a');
+                    a.href = receipt.pdfData;
+                    a.download = `${receipt.name.replace(/ /g, '_')}.pdf`;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                }
+            });
+
+            shareBtn.addEventListener('click', () => {
+                 showAlert('Para compartilhar, primeiro baixe o PDF e depois o anexe na conversa do WhatsApp ou outro aplicativo.');
+            });
+
+            // Carregamento inicial
+            initApp();
+        });
+    </script>
+</body>
+</html>
+
+
+
