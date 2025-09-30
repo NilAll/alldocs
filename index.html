@@ -2,16 +2,28 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>AllDocs - Gerenciador de Documentos</title>
+    
+    <!-- PWA & Mobile Enhancements -->
+    <meta name="theme-color" content="#1f2937">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="manifest" href="data:application/manifest+json;base64,ewogICJuYW1lIjogIkFsbERvY3MiLAogICJzaG9ydF9uYW1lIjogIkFsbERvY3MiLAogICJkZXNjcmlwdGlvbiI6ICJTZXUgZ2VyZW5jaWFkb3IgZGUgZG9jdW1lbnRvcyBsb2NhbC4iLAogICJzdGFydF91cmwiOiAiLiIsCiAgImRpc3BsYXkiOiAic3RhbmRhbG9uZSIsCiAgImJhY2tncm91bmRfY29sb3IiOiAiIzExMTgyNyIsCiAgInRoZW1lX2NvbG9yIjogIiMxZjI5MzciLAogICJpY29ucyI6IFsKICAgIHsKICAgICAgInNyYyI6ICJkYXRhOmltYWdlL3N2Zyt4bWw7YmFzZTY0LFBITjJaeUI0Yld4dWN6MGlhSFIwY0RvdkwzZDNkeTVuYjNKaGJuUnpMend2ZEdsc2JpMDhZMnhoY2lCemRISnZhMlV2Wm5WdWRDSU5aV2hsYkd4NVlYUnBaQ0krUEdSbFptRnRhV3g1WldRZ2MzUnZjbVVnZUhKdmJHeHZjM1J2Y2lCamRHbDBaVDBpZDNacklqNEtJQ0JqYjI1elpUMGliM0prWDJSaGJTQjNjbWx6Y3lCNEsrUnZkRzl6ZENCNWMzUmlZWE5sSUhKbGMybDZaWEp6YjNKd2IzTWdZMkZ3Y3lCM2FXUjBhQ0JoWjJWMFlXNTBYMkZ5YkdsdVpYSXVhVzVuSUhOMGNuVnliQ0I0Yld4dWN6NDhMMmR5ZEdsdFpUNW5iMjluYkdVOUlpQjdDaUFnYm1sMGFXRjBJRDBpWW1GalkyOTFiblJmZEc5clpXNDhMM1JsZUhRK1BHSnZkR1Z5Ym1GdFpUMGliM2NnZDJsa2RHZzlJakF2UGcwS2lDQmpjbWx6Y3kxb2RIUndPaTh2ZDNkM0xtVmhaR2x5YlM5Mk1TSm1aV04wY21WbUp5d3ZkR1Z5Ym1GdFpUMGliM2NnZDJobFpHeGxkQ0I0SytsbWMyVnlhWFIxY2lCM2NtbHpaWE1pSUdkeVpYSnlkV3hsY3lCemRISnZhMlVpSUdOc1lYTmxJRDBpYUhSMGNITTZMeTlqYkdGMGFXOXVYM0JoYm5ScFptbGxjaTh5WnowS1BDOWpiMjV6WlQwaWIzSmtiMjV6SUhCeVpYTnZkWEpqWldWMFlXNTBYMkZ5YkdsdVpYSWlJR1ROWVdSbGJuUnBZV3dpSUdOc1lYTmxJRDBpYUhSMGNITTZMeTk0Yld4dWN6MGlibTl1WTJ4dmMyTnlhVzFwY3k4eVp6MEtQQzloY21WaGJtTmxiblJ5ZFdVZ2RHbDBaUzRnUEM5elpYSjJhV05sSUhacFpYYy9kRzFyZEd3dlp6ND0iLAogICAgICAic2l6ZXMiOiAiMTkyeDE5MiIsCiAgICAgICJ0eXBlIjogImltYWdlL3N2Zyt4bWwiCiAgICB9LAogICAgewogICAgICAic3JjIjogImRhdGE6aW1hZ2Uvc3ZnK3htbDtiYXNlNjQsUEhOMlp5QjRiV3h1Y3owaWFIUjBjRG92TDNkM2R5NW5iM0poYm5Sekx6d3ZkR2xzYmkxM1l5QnpkSEp2YTJVdlpuVnVkQ0lOWldobGJIeDVZWFJwWkNJcVBHUmxabUZ0YVd4NVpXUWdjM1J2Y21VZ2VITnZkM1J3YjJ4bGRDSmRZbkpoYlc5aGJDQmpkR2wwWlQwaWQzWXhJajRLSUNCanoybDBaUzFvZEhSd09pOHZkM2QzTG1WM1pYSnBibWNpQzNOdmJtUnliMmxrWDJSaGJTQjNjbWx6Y3lCNGEyVjVJRkp2YjJOMGNuVnliQ0JqYjI1elpUMGliM0prWDJSaGJTQjNjbWx6Y3lCNGEyVjVJRkp2YjJOMGNuVnliQ0I0S2tWbWJtRnRaVDBpYzNSeWIzSmhaQ0JoWjJWMFlXNTBYMkZ5YkdsdVpYSXVhVzVuSUhOMGNuVnliQ0I0Yld4dWN6NDhMMmR5ZEdsdFpUNW5iMjluYkdVOUlpQjdDaUFnYm1sMGFXRjBJRDBpWW1GalkyOTFiblJmZEc5clpXNDhMM1JsZUhRK1BHSnZkR1Z5Ym1GdFpUMGliM3NnZDJsa2RHZzlJakF2UGcwS2lDQmpjbWx6Y3kxb2RIUndPaTh2ZDNkM0xtVmhaR2x5YlM5Mk1TSm1aV04wY21WbUp5d3ZkR1Z5Ym1GdFpUMGliM3NnZDJobFpHeGxkQ0I0SytsbWMyVnlhWFIxY2lCM2NtbHpaWE1pSUdkeVpYSnlkV3hsY3lCemRISnZhMlVpSUdOc1lYTmxJRDBpYUhSMGNITTZMeTlqYkdGMGFXOXVYM0JoYm5ScFptbGxjaTh5WnowS1BDOWpiMjV6WlQwaWIzSmtiMjV6SUhCeVpYTnZkWEpqWldWMFlXNTBYMkZ5YkdsdVpYSWlJR1ROWVdSbGJuUnBZV3dpSUdOc1lYTmxJRDBpYUhSMGNITTZMeTk0Yld4dWN6MGlibTl1WTJ4dmMyTnlhVzFwY3k4eVp6MEtQQzloY21WaGJtTmxiblJ5ZFdVZ2RHbDBaUzRnUEM5elpYSjJhV05sSUhacFpYYy9kRzFyZEd3dlp6ND0iLAogICAgICAic2l6ZXMiOiAiNTEyeDUxMiIsCiAgICAgICJ0eXBlIjogImltYWdlL3N2Zyt4bWwiCiAgICB9CiAgXQp9Cg==">
+    
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
-        /* Estilo para garantir que o layout ocupe a tela toda no mobile */
+        :root {
+            /* Variavel para corrigir a altura em navegadores mobile */
+            --vh: 1vh;
+        }
         html, body {
-            height: 100%;
+            height: 100vh; /* Fallback */
+            height: calc(var(--vh, 1vh) * 100);
             overflow: hidden;
+            -webkit-tap-highlight-color: transparent; /* Remove o highlight azul ao tocar em links/botões */
         }
         body {
             display: flex;
@@ -43,9 +55,26 @@
         main::-webkit-scrollbar-track {
             background-color: #1f2937;
         }
+        /* Feedback visual para botões em toque */
+        button:active, label:active {
+            transform: scale(0.97);
+            filter: brightness(0.9);
+            transition: transform 0.1s, filter 0.1s;
+        }
+        /* Previne seleção de texto acidental */
+        button, label, .view-btn, .delete-btn {
+            user-select: none;
+            -webkit-user-select: none;
+        }
     </style>
 </head>
 <body class="bg-gray-900 text-white font-sans">
+    
+    <!-- Tela de Carregamento -->
+    <div id="loading-screen" class="fixed inset-0 bg-gray-900 flex flex-col items-center justify-center z-[200]">
+        <i data-lucide="shield-check" class="w-24 h-24 text-indigo-500 mb-6 animate-pulse"></i>
+        <p class="text-gray-400">Carregando AllDocs...</p>
+    </div>
 
     <!-- Auth Screen: Tela de Login/Cadastro -->
     <div id="auth-screen" class="flex flex-col items-center justify-center h-full p-6">
@@ -54,7 +83,7 @@
         <p class="text-gray-400 mb-8">Seu gerenciador de documentos local.</p>
         
         <div class="w-full max-w-sm">
-            <form id="auth-form" class="space-y-4">
+            <form id="auth-form" class="space-y-4" onsubmit="return false;">
                 <div>
                     <label for="username" class="block text-sm font-medium text-gray-300 mb-1">Nome de Usuário</label>
                     <input type="text" id="username" placeholder="Digite seu usuário" class="w-full bg-gray-700 text-white rounded-md p-3 focus:outline-none focus:ring-2 focus:ring-indigo-500" required>
@@ -105,7 +134,7 @@
         </div>
 
         <!-- Floating Action Button (FAB) -->
-        <button id="add-receipt-btn" class="fixed bottom-6 right-6 bg-indigo-600 hover:bg-indigo-700 text-white rounded-full p-4 shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-900 focus:ring-indigo-500 transition-transform transform hover:scale-110">
+        <button id="add-receipt-btn" class="fixed right-6 bg-indigo-600 hover:bg-indigo-700 text-white rounded-full p-4 shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-900 focus:ring-indigo-500 transition-transform transform hover:scale-110" style="bottom: calc(1.5rem + env(safe-area-inset-bottom));">
             <i data-lucide="plus" class="w-8 h-8"></i>
         </button>
     </div>
@@ -134,7 +163,7 @@
                             <i data-lucide="upload" class="w-5 h-5"></i>
                             <span>Upload</span>
                         </label>
-                        <input type="file" id="upload-file-input" accept="image/*,application/pdf" class="hidden">
+                        <input type="file" id="upload-file-input" accept="image/*,application/pdf,.doc,.docx,.xls,.xlsx,.txt" class="hidden">
                     </div>
                     <p id="file-name" class="text-sm text-gray-400 mt-2 truncate"></p>
                 </div>
@@ -154,8 +183,14 @@
                 <i data-lucide="x" class="w-6 h-6"></i>
             </button>
         </div>
-        <div class="flex-grow p-1 bg-gray-700">
-             <iframe id="pdf-viewer" class="w-full h-full border-none"></iframe>
+        <div class="flex-grow p-1 bg-gray-700 flex items-center justify-center">
+             <iframe id="pdf-viewer" class="w-full h-full border-none hidden"></iframe>
+             <img id="image-viewer" class="max-w-full max-h-full object-contain hidden" />
+             <div id="no-preview" class="text-center text-gray-400 hidden p-4">
+                <i data-lucide="file-question" class="w-24 h-24 mx-auto mb-4"></i>
+                <p class="font-semibold">Pré-visualização não disponível.</p>
+                <p class="text-sm">Use o botão de download para abrir o arquivo.</p>
+             </div>
         </div>
         <div class="bg-gray-800 p-4 flex justify-around items-center">
             <button id="download-btn" class="flex flex-col items-center text-indigo-400 hover:text-indigo-300">
@@ -222,8 +257,23 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
+            // --- INICIALIZAÇÃO E MELHORIAS MOBILE ---
+            
+            // Corrige o problema de 100vh em navegadores de celular
+            function setVh() {
+                let vh = window.innerHeight * 0.01;
+                document.documentElement.style.setProperty('--vh', `${vh}px`);
+            }
+            window.addEventListener('resize', setVh);
+            window.addEventListener('orientationchange', setVh);
+            setVh();
+
             // Inicializa os ícones do Lucide
             lucide.createIcons();
+
+            // Esconde a tela de carregamento
+            const loadingScreen = document.getElementById('loading-screen');
+            loadingScreen.style.display = 'none';
 
             // Elementos da DOM
             const authScreen = document.getElementById('auth-screen');
@@ -257,6 +307,8 @@
             const downloadBtn = document.getElementById('download-btn');
             const shareBtn = document.getElementById('share-btn');
             const emptyState = document.getElementById('empty-state');
+            const imageViewer = document.getElementById('image-viewer');
+            const noPreview = document.getElementById('no-preview');
 
             const alertModal = document.getElementById('alert-modal');
             const alertMessage = document.getElementById('alert-message');
@@ -345,8 +397,14 @@
             
             function loadReceipts() {
                 if (!currentUser) return;
-                const storedReceipts = localStorage.getItem(`allDocsData_${currentUser}`);
-                receipts = storedReceipts ? JSON.parse(storedReceipts) : [];
+                try {
+                    const storedReceipts = localStorage.getItem(`allDocsData_${currentUser}`);
+                    receipts = storedReceipts ? JSON.parse(storedReceipts) : [];
+                } catch(e) {
+                    console.error("Erro ao carregar dados:", e);
+                    receipts = [];
+                    showAlert("Não foi possível carregar seus dados. Eles podem estar corrompidos.");
+                }
                 renderReceipts();
             }
             
@@ -430,8 +488,7 @@
                 reader.onload = (e) => {
                     try {
                         const restoredData = JSON.parse(e.target.result);
-                        // Validação simples do backup
-                        if (Array.isArray(restoredData) && (restoredData.length === 0 || restoredData[0].id)) {
+                        if (Array.isArray(restoredData) && (restoredData.length === 0 || (restoredData[0].id && restoredData[0].name))) {
                              showConfirm('Isso substituirá TODOS os seus dados atuais. Deseja continuar?', () => {
                                 receipts = restoredData;
                                 saveReceipts();
@@ -482,85 +539,62 @@
                 if (receipt) {
                     currentViewingId = id;
                     document.getElementById('view-modal-title').textContent = receipt.name;
-                    pdfViewer.src = receipt.pdfData;
+
+                    // Esconde todos os visualizadores primeiro
+                    pdfViewer.classList.add('hidden');
+                    imageViewer.classList.add('hidden');
+                    noPreview.classList.add('hidden');
+                    pdfViewer.src = 'about:blank';
+                    imageViewer.src = '';
+
+                    if (receipt.fileType === 'application/pdf') {
+                        pdfViewer.src = receipt.fileData;
+                        pdfViewer.classList.remove('hidden');
+                    } else if (receipt.fileType && receipt.fileType.startsWith('image/')) {
+                        imageViewer.src = receipt.fileData;
+                        imageViewer.classList.remove('hidden');
+                    } else {
+                        noPreview.classList.remove('hidden');
+                    }
+
                     viewModal.classList.remove('hidden');
                     viewModal.classList.add('flex');
                 }
             }
-            function closeViewModal() { viewModal.classList.add('hidden'); viewModal.classList.remove('flex'); pdfViewer.src = ''; currentViewingId = null; }
+            function closeViewModal() {
+                 viewModal.classList.add('hidden');
+                 viewModal.classList.remove('flex');
+                 document.getElementById('pdf-viewer').src = 'about:blank';
+                 document.getElementById('image-viewer').src = '';
+                 currentViewingId = null;
+            }
             function openSettingsModal() { settingsModal.classList.remove('hidden'); }
             function closeSettingsModal() { settingsModal.classList.add('hidden'); }
 
-            // --- LÓGICA DE ADIÇÃO DE DOCUMENTOS (PDF) ---
+            // --- LÓGICA DE ADIÇÃO DE DOCUMENTOS ---
 
-            function processImageFile(file) {
-                return new Promise((resolve, reject) => {
-                    const reader = new FileReader();
-                    reader.onload = (e) => {
-                        const img = new Image();
-                        img.onload = () => {
-                            try {
-                                const { jsPDF } = window.jspdf;
-                                const doc = new jsPDF();
-                                const imgData = e.target.result;
-                                const imgProps = doc.getImageProperties(imgData);
-                                const pdfWidth = doc.internal.pageSize.getWidth();
-                                let pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
-                                let pageHeight = doc.internal.pageSize.getHeight();
-                                
-                                // Lida com imagens muito altas para a página
-                                if (pdfHeight > pageHeight) {
-                                    // A imagem será cortada se for maior que a página,
-                                    // mas isso evita a criação de PDFs inválidos.
-                                    pdfHeight = pageHeight;
-                                }
-
-                                doc.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight);
-                                resolve(doc.output('datauristring'));
-                            } catch (error) {
-                                reject(error);
-                            }
-                        };
-                        img.onerror = reject;
-                        img.src = e.target.result;
+            function addReceipt(name, file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const fileData = e.target.result;
+                    const newReceipt = {
+                        id: Date.now().toString(),
+                        name: name,
+                        date: new Date().toISOString(),
+                        fileName: file.name,
+                        fileType: file.type || 'application/octet-stream',
+                        fileData: fileData
                     };
-                    reader.onerror = reject;
-                    reader.readAsDataURL(file);
-                });
-            }
-
-            function processPdfFile(file) {
-                return new Promise((resolve, reject) => {
-                    const reader = new FileReader();
-                    reader.onload = (e) => resolve(e.target.result);
-                    reader.onerror = reject;
-                    reader.readAsDataURL(file);
-                });
-            }
-
-            async function addReceipt(name, file) {
-                try {
-                    let pdfDataUri;
-                    if (file.type.startsWith('image/')) {
-                        pdfDataUri = await processImageFile(file);
-                    } else if (file.type === 'application/pdf') {
-                        pdfDataUri = await processPdfFile(file);
-                    } else {
-                        showAlert('Formato de arquivo não suportado. Use imagens (JPG, PNG) ou PDF.');
-                        return;
-                    }
-
-                    if (pdfDataUri) {
-                        const newReceipt = { id: Date.now().toString(), name: name, date: new Date().toISOString(), pdfData: pdfDataUri };
-                        receipts.unshift(newReceipt);
-                        saveReceipts();
-                        renderReceipts();
-                        closeAddModal();
-                    }
-                } catch (error) {
-                    console.error("Error processing file:", error);
-                    showAlert('Ocorreu um erro ao processar o arquivo. Pode ser um formato de imagem não suportado ou o arquivo está corrompido.');
-                }
+                    receipts.unshift(newReceipt);
+                    saveReceipts();
+                    renderReceipts();
+                    closeAddModal();
+                };
+                reader.onerror = (error) => {
+                    console.error("Erro ao ler arquivo:", error);
+                    showAlert('Ocorreu um erro ao ler o arquivo.');
+                };
+                reader.readAsDataURL(file);
             }
 
             // --- MANIPULADORES DE EVENTOS ---
@@ -615,16 +649,41 @@
                 const receipt = receipts.find(r => r.id === currentViewingId);
                 if (receipt) {
                     const a = document.createElement('a');
-                    a.href = receipt.pdfData;
-                    a.download = `${receipt.name.replace(/ /g, '_')}.pdf`;
+                    a.href = receipt.fileData;
+                    a.download = receipt.fileName;
                     document.body.appendChild(a);
                     a.click();
                     document.body.removeChild(a);
                 }
             });
 
-            shareBtn.addEventListener('click', () => {
-                 showAlert('Para compartilhar, primeiro baixe o PDF e depois o anexe na conversa do WhatsApp ou outro aplicativo.');
+            shareBtn.addEventListener('click', async () => {
+                const receipt = receipts.find(r => r.id === currentViewingId);
+                if (!receipt) return;
+                
+                try {
+                    // Tenta usar a API de Compartilhamento Web (moderna)
+                    if (navigator.share && navigator.canShare) {
+                        const response = await fetch(receipt.fileData);
+                        const blob = await response.blob();
+                        const file = new File([blob], receipt.fileName, { type: receipt.fileType });
+
+                        if (navigator.canShare({ files: [file] })) {
+                            await navigator.share({
+                                title: receipt.name,
+                                text: `Documento de AllDocs: ${receipt.name}`,
+                                files: [file],
+                            });
+                            return; // Sucesso, sai da função
+                        }
+                    }
+                    // Fallback se a API não existir ou não puder compartilhar o arquivo
+                    showAlert('Para compartilhar, primeiro baixe o arquivo e depois o anexe na conversa.');
+
+                } catch (error) {
+                    console.error('Erro ao compartilhar:', error);
+                    showAlert('Não foi possível compartilhar. Por favor, baixe o arquivo e compartilhe manualmente.');
+                }
             });
 
             // Carregamento inicial
@@ -633,6 +692,4 @@
     </script>
 </body>
 </html>
-
-
 
