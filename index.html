@@ -79,7 +79,7 @@
     <!-- Auth Screen: Tela de Login/Cadastro -->
     <div id="auth-screen" class="flex flex-col items-center justify-center h-full p-6">
         <i data-lucide="shield-check" class="w-24 h-24 text-indigo-500 mb-6"></i>
-        <h1 class="text-4xl font-bold text-white mb-2">Bem-vindo ao AllDocs</h1>
+        <h1 class="text-4xl font-bold text-white mb-2">AllDocs</h1>
         <p class="text-gray-400 mb-8">Seu gerenciador de documentos local.</p>
         
         <div class="w-full max-w-sm">
@@ -98,6 +98,7 @@
                 </div>
             </form>
             <p class="text-xs text-gray-500 mt-4 text-center">Suas contas e dados são salvos apenas neste dispositivo.</p>
+            <p class="text-xs text-gray-500 mt-1 text-center">Versão 1.1</p>
         </div>
     </div>
 
@@ -152,16 +153,10 @@
                 </div>
                 <div class="mb-6">
                     <label class="block text-sm font-medium text-gray-300 mb-2">Anexar Documento</label>
-                    <div class="flex space-x-2">
-                        <label for="take-photo-input" class="flex-1 cursor-pointer text-center bg-gray-700 hover:bg-gray-600 text-indigo-300 font-bold py-2 px-4 rounded-md transition duration-300 flex items-center justify-center space-x-2">
-                            <i data-lucide="camera" class="w-5 h-5"></i>
-                            <span>Tirar Foto</span>
-                        </label>
-                        <input type="file" id="take-photo-input" accept="image/*" capture="environment" class="hidden">
-                        
-                        <label for="upload-file-input" class="flex-1 cursor-pointer text-center bg-gray-700 hover:bg-gray-600 text-indigo-300 font-bold py-2 px-4 rounded-md transition duration-300 flex items-center justify-center space-x-2">
+                    <div>
+                        <label for="upload-file-input" class="w-full cursor-pointer text-center bg-gray-700 hover:bg-gray-600 text-indigo-300 font-bold py-3 px-4 rounded-md transition duration-300 flex items-center justify-center space-x-2">
                             <i data-lucide="upload" class="w-5 h-5"></i>
-                            <span>Upload</span>
+                            <span>Fazer Upload do Arquivo</span>
                         </label>
                         <input type="file" id="upload-file-input" accept="image/*,application/pdf,.doc,.docx,.xls,.xlsx,.txt" class="hidden">
                     </div>
@@ -298,7 +293,6 @@
             const cancelAddBtn = document.getElementById('cancel-add-btn');
             const addReceiptForm = document.getElementById('add-receipt-form');
             const receiptNameInput = document.getElementById('receipt-name');
-            const takePhotoButton = document.getElementById('take-photo-input');
             const uploadFileInput = document.getElementById('upload-file-input');
             const fileNameDisplay = document.getElementById('file-name');
             const viewModal = document.getElementById('view-modal');
@@ -612,7 +606,6 @@
                     fileNameDisplay.textContent = file.name;
                 }
             };
-            takePhotoButton.addEventListener('change', handleFileSelect);
             uploadFileInput.addEventListener('change', handleFileSelect);
 
             addReceiptForm.addEventListener('submit', (e) => {
@@ -692,4 +685,5 @@
     </script>
 </body>
 </html>
+
 
