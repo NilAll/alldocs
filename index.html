@@ -98,7 +98,7 @@
                 </div>
             </form>
             <p class="text-xs text-gray-500 mt-4 text-center">Suas contas e dados são salvos apenas neste dispositivo.</p>
-            <p class="text-xs text-gray-500 mt-1 text-center">Versão 1.1</p>
+            <p id="version-display" class="text-xs text-gray-500 mt-1 text-center">Versão 1.2</p>
         </div>
     </div>
 
@@ -226,6 +226,7 @@
                      <i data-lucide="log-out" class="w-5 h-5"></i>
                     <span>Sair (Logout)</span>
                 </button>
+                <p class="text-xs text-gray-500 pt-2 text-center">AllDocs Versão 1.2</p>
             </div>
         </div>
     </div>
@@ -253,6 +254,8 @@
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             // --- INICIALIZAÇÃO E MELHORIAS MOBILE ---
+            const APP_VERSION = '1.2';
+            document.getElementById('version-display').textContent = `Versão ${APP_VERSION}`;
             
             // Corrige o problema de 100vh em navegadores de celular
             function setVh() {
@@ -392,8 +395,21 @@
             function loadReceipts() {
                 if (!currentUser) return;
                 try {
-                    const storedReceipts = localStorage.getItem(`allDocsData_${currentUser}`);
-                    receipts = storedReceipts ? JSON.parse(storedReceipts) : [];
+                    const storedData = localStorage.getItem(`allDocsData_${currentUser}`);
+                    const data = storedData ? JSON.parse(storedData) : {};
+                    
+                    // Lógica de Migração de Dados
+                    // Se o dado antigo era apenas um array, converte para o novo formato de objeto
+                    if (Array.isArray(data)) {
+                        receipts = data; // Formato antigo
+                        saveReceipts(); // Salva imediatamente no novo formato
+                    } else {
+                        receipts = data.receipts || [];
+                    }
+
+                    // Aqui futuras migrações podem ser adicionadas baseadas em data.version
+                    // Ex: if (data.version < '1.2') { migrateTo1_2(receipts); }
+
                 } catch(e) {
                     console.error("Erro ao carregar dados:", e);
                     receipts = [];
@@ -405,7 +421,11 @@
             function saveReceipts() {
                 if (!currentUser) return;
                 try {
-                    localStorage.setItem(`allDocsData_${currentUser}`, JSON.stringify(receipts));
+                    const dataToStore = {
+                        version: APP_VERSION,
+                        receipts: receipts
+                    };
+                    localStorage.setItem(`allDocsData_${currentUser}`, JSON.stringify(dataToStore));
                 } catch (e) {
                     if (e.name === 'QuotaExceededError' || e.name === 'NS_ERROR_DOM_QUOTA_REACHED') {
                          showAlert("Erro ao salvar: Armazenamento cheio! Faça um backup e apague alguns itens para liberar espaço.");
@@ -685,5 +705,6 @@
     </script>
 </body>
 </html>
+
 
 
